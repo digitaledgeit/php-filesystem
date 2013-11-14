@@ -40,6 +40,12 @@ class Finder implements \IteratorAggregate {
 	 * @param   string      $path   The path(s) to search in
 	 */
 	public function __construct($path) {
+
+		//check if the path exists
+		if (!is_dir($path)) {
+			throw new \InvalidArgumentException("Path \"$path\" does not exist or is not a directory");
+		}
+
 		$this->path = $path;
 	}
 

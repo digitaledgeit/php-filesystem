@@ -7,7 +7,7 @@ use Traversable;
  * Finder
  * @author James Newell <james@digitaledgeit.com.au>
  */
-class Finder implements \IteratorAggregate {
+class Finder implements \IteratorAggregate, \Countable {
 
 	const TYPE_FILE     = 'files';
 	const TYPE_FOLDER   = 'folders';
@@ -100,14 +100,53 @@ class Finder implements \IteratorAggregate {
 	}
 
 	/**
+	 * Copies the files and folders to the destination folder
+	 * @param   string $dest The destination directory
+	 * @return  $this
+	 * @throws
+	 */
+	public function copyTo($dest) {
+		$fs = new Filesystem();
+
+		//check the destination directory exists
+		if (!is_dir($dest)) {
+			throw new \RuntimeException("Destination directory \"$dest\" does not exist.");
+		}
+
+		foreach ($this->getIterator() as $srcPath) {
+
+			//create the destination path
+			$destPath = $dest.DIRECTORY_SEPARATOR.$fs->getRelativePath($srcPath, $this->path);
+
+			//create the parent folder in case it hasn't already been created
+			$fs->mkdir(dirname($destPath));
+
+			//copy the file/folder to the destination
+			$fs->copy($srcPath, $destPath);
+
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Deletes the files and folders
+	 * @return  $this
+	 */
+	public function remove() {
+		$fs = new Filesystem();
+
+		foreach ($this->getIterator() as $srcPath) {
+			$fs->remove($srcPath);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getIterator() {
-
-		//filter out parent directories
-		$this->filter(function($path /** @var \SplFileInfo $path */) {
-			return $path->getFilename() !== '..';
-		});
 
 		//filter by path type
 		if ($this->type) {
@@ -140,33 +179,10 @@ class Finder implements \IteratorAggregate {
 	}
 
 	/**
-	 * Copies the files and folders to the destination folder
-	 * @param   string $dest The destination directory
-	 * @return  $this
-	 * @throws
+	 * @inheritdoc
 	 */
-	public function copyTo($dest) {
-		$fs = new Filesystem();
-
-		//check the destination directory exists
-		if (!is_dir($dest)) {
-			throw new \RuntimeException("Destination directory \"$dest\" does not exist.");
-		}
-
-		foreach ($this->getIterator() as $srcPath) {
-
-			//create the destination path
-			$destPath = $dest.DIRECTORY_SEPARATOR.$fs->getRelativePath($srcPath, $this->path);
-
-			//create the parent folder in case it hasn't already been created
-			$fs->mkdir(dirname($destPath));
-
-			//copy the file/folder to the destination
-			$fs->copy($srcPath, $destPath);
-
-		}
-
-		return $this;
+	public function count() {
+		return $this->getIterator()->count();
 	}
 
 }

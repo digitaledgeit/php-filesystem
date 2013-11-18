@@ -60,6 +60,15 @@ class Filesystem {
 	}
 
 	/**
+	 * Gets whether the path exists on disk
+	 * @param   string $path
+	 * @return  bool
+	 */
+	public function exists($path) {
+		return file_exists($path);
+	}
+
+	/**
 	 * Creates the directory
 	 * @param   string  $path
 	 * @param   int     $perms
@@ -123,11 +132,14 @@ class Filesystem {
 	 * @return  $this
 	 * @throws
 	 */
-	public function delete($path) {
+	public function remove($path) {
 		$paths = (array) $path;
 
 		if (is_dir($path)) {
-
+			$f = new Finder($path);
+			foreach ($f as $file) {
+				$this->remove($file);
+			}
 		} else {
 			if (!@unlink($path)) {
 				throw new \Exception(sprintf('Unable to delete path %s.', $path));

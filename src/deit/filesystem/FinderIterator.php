@@ -32,7 +32,7 @@ class FinderIterator implements \Iterator, \Countable {
 
 		//create the iterator
 		$this->iterator = new \RecursiveDirectoryIterator($path);
-		//$this->iterator->setFlags(\FilesystemIterator::SKIP_DOTS);
+		$this->iterator->setFlags(\FilesystemIterator::SKIP_DOTS);
 
 		//decorate the iterator
 		$this->iterator = new \RecursiveIteratorIterator($this->iterator);

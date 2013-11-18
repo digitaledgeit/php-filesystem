@@ -116,11 +116,11 @@ class Finder implements \IteratorAggregate, \Countable {
 			//create the destination path
 			$destPath = $dest.DIRECTORY_SEPARATOR.$fs->getRelativePath($srcPath, $this->path);
 
-			//create the parent folder in case it hasn't already been created
-			$fs->mkdir(dirname($destPath));
-
-			//copy the file/folder to the destination
-			$fs->copy($srcPath, $destPath);
+			if ($srcPath->isDir()) {
+				$fs->mkdir($destPath);
+			} else {
+				$fs->copy($srcPath, $destPath);
+			}
 
 		}
 

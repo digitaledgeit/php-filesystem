@@ -190,10 +190,11 @@ class Filesystem {
 		if (is_dir($path)) {
 
 			//remove the directory contents
-			$f = new Finder($path);
-			$f->depth(1);
-			foreach ($f as $p) {
-				$this->remove($p->getPathname());
+			$it = new \DirectoryIterator($path);
+			foreach ($it as $p) {
+				if (!$p->isDot()) {
+					$this->remove($p->getPathname());
+				}
 			}
 
 			//remove the folder

@@ -190,6 +190,8 @@ class Filesystem {
 		if (is_dir($path)) {
 
 			//remove the directory contents
+			//** I had to use DirectoryIterator instead of Finder because I kept hitting the max # files open
+			//@see http://php.net/manual/en/directoryiterator.construct.php#87425
 			$it = new \DirectoryIterator($path);
 			foreach ($it as $p) {
 				if (!$p->isDot()) {

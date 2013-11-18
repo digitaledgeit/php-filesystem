@@ -95,7 +95,11 @@ class Filesystem {
 
 		if (is_dir($src)) {
 
-			foreach (new Finder($src) as $path) {
+			$this->mkdir($dest);
+
+			$f = new Finder($src);
+			$f->depth(1);
+			foreach ($f as $path) {
 				$this->copy($path->getPathname(), $dest.DIRECTORY_SEPARATOR.$this->getRelativePath($path->getPathname(), $src));
 			}
 
@@ -139,7 +143,9 @@ class Filesystem {
 
 		if (is_dir($src)) {
 
-			foreach (new Finder($src) as $path) {
+			$f = new Finder($src);
+			$f->depth(1);
+			foreach ($f as $path) {
 				$this->move($path->getPathname(), $dest.DIRECTORY_SEPARATOR.$this->getRelativePath($path->getPathname(), $src));
 			}
 
@@ -173,8 +179,8 @@ class Filesystem {
 	}
 
 	/**
-	 * Deletes the specified files
-	 * @param   string $path
+	 * Deletes the specified file or folder
+	 * @param   string  $path
 	 * @return  $this
 	 * @throws
 	 */
@@ -182,14 +188,26 @@ class Filesystem {
 		$paths = (array) $path;
 
 		if (is_dir($path)) {
+
+			//remove the directory contents
 			$f = new Finder($path);
-			foreach ($f as $file) {
-				$this->remove($file);
+			$f->depth(1);
+			foreach ($f as $p) {
+				$this->remove($p->getPathname());
 			}
+
+			//remove the folder
+			if (!rmdir($path)) {
+				throw new \Exception(sprintf('Unable to delete folder "%s".', $path));
+			}
+
 		} else {
-			if (!@unlink($path)) {
-				throw new \Exception(sprintf('Unable to delete path %s.', $path));
+
+			//remove the file
+			if (!unlink($path)) {
+				throw new \Exception(sprintf('Unable to delete file "%s".', $path));
 			}
+
 		}
 
 		return $this;

@@ -19,73 +19,41 @@ class Finder implements \IteratorAggregate, \Countable {
 	private $path;
 
 	/**
-	 * An array of filters used to restrict the resulting list of files or folders
-	 * @var     callable[string]
-	 */
-	private $filters = [];
-
-	private $type;
-
-
-	private $named = [];
-
-	/**
-	 * The depth
+	 * The recursive depth
 	 * @var     int
 	 */
 	private $depth;
 
 	/**
+	 * An array of filters used to restrict the resulting list of files or folders
+	 * @var     callable[string]
+	 */
+	private $filters        = [];
+	private $filterByType   = [];
+	private $filterByName   = [];
+
+	/**
 	 * Constructs the finder
-	 * @param   string      $path   The path(s) to search in
+	 * @param   string      $path   The path to search
+	 * @throws
 	 */
 	public function __construct($path) {
 
 		//check if the path exists
 		if (!is_dir($path)) {
-			throw new \InvalidArgumentException("Path \"$path\" does not exist or is not a directory");
+			throw new \InvalidArgumentException("Path \"$path\" does not exist or is not a folder");
 		}
 
 		$this->path = $path;
 	}
 
 	/**
-	 * Adds a filter to restrict the resulting list of files or folders
-	 * @param   callable    $filter
+	 * Restricts the depth of the iterator
+	 * @param   int $depth
 	 * @return  $this
 	 */
-	public function filter(callable $filter) {
-		$this->filters[] = $filter;
-		return $this;
-	}
-
-	/**
-	 * Restricts the results to only contain files
-	 * @return  $this
-	 * @throws
-	 */
-	public function files() {
-
-		if (!empty($this->type)) {
-			throw new \InvalidArgumentException("Results have already limited to {$this->type}.");
-		}
-
-		$this->type = self::TYPE_FILE;
-		return $this;
-	}
-
-	/**
-	 * Restricts the results to only contain folders
-	 * @return  $this
-	 * @throws
-	 */
-	public function folders() {
-
-		if (!empty($this->type)) {
-			throw new \InvalidArgumentException("Results have already limited to {$this->type}.");
-		}
-
-		$this->type = self::TYPE_FOLDER;
+	public function depth($depth) {
+		$this->depth = (int) $depth;
 		return $this;
 	}
 
@@ -95,7 +63,37 @@ class Finder implements \IteratorAggregate, \Countable {
 	 * @return  $this
 	 */
 	public function named($pattern) {
-		$this->named[] = $pattern;
+		$this->filterByName[] = $pattern;
+		return $this;
+	}
+
+	/**
+	 * Restricts the results to only contain files
+	 * @return  $this
+	 * @throws
+	 */
+	public function files() {
+		$this->filterByType[] = self::TYPE_FILE;
+		return $this;
+	}
+
+	/**
+	 * Restricts the results to only contain folders
+	 * @return  $this
+	 * @throws
+	 */
+	public function folders() {
+		$this->filterByType[] = self::TYPE_FOLDER;
+		return $this;
+	}
+
+	/**
+	 * Adds a filter to restrict the resulting list of files or folders
+	 * @param   callable    $filter
+	 * @return  $this
+	 */
+	public function filter(callable $filter) {
+		$this->filters[] = $filter;
 		return $this;
 	}
 
@@ -149,22 +147,25 @@ class Finder implements \IteratorAggregate, \Countable {
 	public function getIterator() {
 
 		//filter by path type
-		if ($this->type) {
-			$type = $this->type;
-			$this->filter(function($path /** @var \SplFileInfo $path */) use($type) {
-				if ($type == self::TYPE_FILE) {
-					return $path->isFile();
-				} else if ($type == self::TYPE_FOLDER) {
-					return $path->isDir();
-				} else {
-					return false;
+		if ($this->filterByType) {
+			$types = $this->filterByType;
+			$this->filter(function($path /** @var \SplFileInfo $path */) use($types) {
+
+				if (in_array(self::TYPE_FILE, $types) && $path->isFile()) {
+					return true;
 				}
+
+				if (in_array(self::TYPE_FOLDER, $types) && $path->isDir()) {
+					return true;
+				}
+
+				return false;
 			});
 		}
 
 		//filter by name
-		if (count($this->named)) {
-			$named = $this->named;
+		if (count($this->filterByName)) {
+			$named = $this->filterByName;
 			$this->filter(function($path /** @var \SplFileInfo $path */) use ($named) {
 				foreach ($named as $name) {
 					if (preg_match($name, $path->getFilename()) > 0) {
@@ -175,7 +176,7 @@ class Finder implements \IteratorAggregate, \Countable {
 			});
 		}
 
-		return new FinderIterator($this->path, $this->filters);
+		return new FinderIterator($this->path, $this->depth, $this->filters);
 	}
 
 	/**

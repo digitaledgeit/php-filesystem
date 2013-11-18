@@ -96,7 +96,7 @@ class Filesystem {
 		if (is_dir($src)) {
 
 			foreach (new Finder($src) as $path) {
-				$this->copy($path->getPathname(), $dest.DIRECTORY_SEPARATOR.$path->getFilename());
+				$this->copy($path->getPathname(), $dest.DIRECTORY_SEPARATOR.$this->getRelativePath($path->getPathname(), $src));
 			}
 
 			return $this;
@@ -110,8 +110,9 @@ class Filesystem {
 			}
 
 			//check the parent folder exists
-			if (!is_dir(dirname($dest))) {
-				throw new \Exception("Parent directory $dest does not exist");
+			$parent = dirname($dest);
+			if (!is_dir($parent)) {
+				throw new \Exception("Parent directory $parent does not exist");
 			}
 
 			if (!copy($src, $dest)) {
@@ -124,6 +125,51 @@ class Filesystem {
 			throw new \InvalidArgumentException("Path \"$src\" does not exist.");
 		}
 
+		return $this;
+	}
+
+	/**
+	 * Moves the source file or directory to the destination
+	 * @param   string     $src    The source path(s)
+	 * @param   string     $dest   The destination path
+	 * @return  $this
+	 * @throws
+	 */
+	public function move($src, $dest) {
+
+		if (is_dir($src)) {
+
+			foreach (new Finder($src) as $path) {
+				$this->move($path->getPathname(), $dest.DIRECTORY_SEPARATOR.$this->getRelativePath($path->getPathname(), $src));
+			}
+
+			return $this;
+		}
+
+		if (file_exists($src)) {
+
+			//if the destination is a folder then we'll create a new file with the same name as the source file
+			if (is_dir($dest)) {
+				$dest .= DIRECTORY_SEPARATOR.basename($src);
+			}
+
+			//check the parent folder exists
+			$parent = dirname($dest);
+			if (!is_dir($parent)) {
+				throw new \Exception("Parent directory $parent does not exist");
+			}
+
+			if (!rename($src, $dest)) {
+				throw new \RuntimeException("Unable to move file \"$src\" to \"$dest\".");
+			}
+
+			return $this;
+
+		} else {
+			throw new \InvalidArgumentException("Path \"$src\" does not exist.");
+		}
+
+		return $this;
 	}
 
 	/**

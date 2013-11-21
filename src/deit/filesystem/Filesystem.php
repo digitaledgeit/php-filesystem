@@ -65,6 +65,8 @@ class Filesystem {
 	 * @return  bool
 	 */
 	public function exists($path) {
+		$path = (string) $path;
+
 		return file_exists($path);
 	}
 
@@ -76,11 +78,14 @@ class Filesystem {
 	 * @throws  \RuntimeException
 	 */
 	public function mkdir($path, $perms = 0754) {
+		$path = (string) $path;
+
 		if (!is_dir($path)) {
 			if (!mkdir($path, $perms, true)) {
 				throw new \RuntimeException("Unable to create directory \"$path\".");
 			}
 		}
+
 		return $this;
 	}
 
@@ -92,6 +97,8 @@ class Filesystem {
 	 * @throws
 	 */
 	public function copy($src, $dest) {
+		$src = (string) $src;
+		$dest = (string) $dest;
 
 		if (is_dir($src)) {
 
@@ -116,7 +123,7 @@ class Filesystem {
 			//check the parent folder exists
 			$parent = dirname($dest);
 			if (!is_dir($parent)) {
-				throw new \Exception("Parent directory $parent does not exist");
+				throw new \Exception("Parent folder $parent does not exist");
 			}
 
 			if (!copy($src, $dest)) {
@@ -140,6 +147,8 @@ class Filesystem {
 	 * @throws
 	 */
 	public function move($src, $dest) {
+		$src = (string) $src;
+		$dest = (string) $dest;
 
 		if (is_dir($src)) {
 
@@ -162,7 +171,7 @@ class Filesystem {
 			//check the parent folder exists
 			$parent = dirname($dest);
 			if (!is_dir($parent)) {
-				throw new \Exception("Parent directory $parent does not exist");
+				throw new \Exception("Parent folder $parent does not exist");
 			}
 
 			if (!rename($src, $dest)) {
@@ -185,18 +194,16 @@ class Filesystem {
 	 * @throws
 	 */
 	public function remove($path) {
-		$paths = (array) $path;
+		$path = (string) $path;
 
 		if (is_dir($path)) {
 
 			//remove the directory contents
-			//** I had to use DirectoryIterator instead of Finder because I kept hitting the max # files open
+			//** I had to use DirectoryIterator instead of deit\filesystem\Finder because I kept hitting the max # files open
 			//@see http://php.net/manual/en/directoryiterator.construct.php#87425
-			$it = new \DirectoryIterator($path);
+			$it = new \FilesystemIterator($path);
 			foreach ($it as $p) {
-				if (!$p->isDot()) {
-					$this->remove($p->getPathname());
-				}
+				$this->remove($p->getPathname());
 			}
 
 			//remove the folder

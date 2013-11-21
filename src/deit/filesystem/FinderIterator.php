@@ -37,13 +37,9 @@ class FinderIterator implements \Iterator, \Countable {
 		if ($depth === 0) {
 			$this->iterator = new \EmptyIterator();
 		} else if ($depth === 1) {
-			$this->iterator = new \DirectoryIterator($path);
-			$this->iterator = new \CallbackFilterIterator($this->iterator, function($path) {
-				return !$path->isDot();
-			});
+			$this->iterator = new \FilesystemIterator($path, $flags);
 		} else {
-			$this->iterator = new \RecursiveDirectoryIterator($path);
-			$this->iterator->setFlags($flags);
+			$this->iterator = new \RecursiveDirectoryIterator($path, $flags);
 			$this->iterator = new \RecursiveIteratorIterator($this->iterator, \RecursiveIteratorIterator::SELF_FIRST);
 			if ($depth) $this->iterator->setMaxDepth($depth - 1);
 		}

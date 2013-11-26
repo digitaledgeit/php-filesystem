@@ -21,6 +21,51 @@ class Filesystem {
 	}
 
 	/**
+	 * Gets the home directory
+	 * @return  string
+	 * @throws
+	 */
+	public function getHomeDirectory() {
+
+		if (isset($_SERVER['HOME'])) {
+			$path = $_SERVER['HOME'];
+		} else if (isset($_SERVER['USERPROFILE'])) {
+			$path = $_SERVER['USERPROFILE'];
+		} else {
+			throw new \InvalidArgumentException('Unable to locate the user\'s home directory.');
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Gets whether the path exists on disk
+	 * @param   string $path
+	 * @return  bool
+	 */
+	public function exists($path) {
+		return file_exists($path);
+	}
+	
+	/**
+	 * Checks whether a file exists at the path
+	 * @param   string $path
+	 * @return  bool
+	 */
+	public function isFile($path) {
+		return is_file($path);
+	}
+
+	/**
+	 * Checks whether a directory exists at the path
+	 * @param   string $path
+	 * @return  bool
+	 */
+	public function isDirectory($path) {
+		return is_dir($path);
+	}
+
+	/**
 	 * Gets the relative path
 	 * @param   string $path
 	 * @param   string $context
@@ -57,17 +102,6 @@ class Filesystem {
 		}
 
 		return join(DIRECTORY_SEPARATOR, $rParts);
-	}
-
-	/**
-	 * Gets whether the path exists on disk
-	 * @param   string $path
-	 * @return  bool
-	 */
-	public function exists($path) {
-		$path = (string) $path;
-
-		return file_exists($path);
 	}
 
 	/**

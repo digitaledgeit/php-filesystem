@@ -222,7 +222,7 @@ class Filesystem {
 	}
 
 	/**
-	 * Deletes the specified file or folder
+	 * Deletes a file or folder if it exists
 	 * @param   string  $path
 	 * @return  $this
 	 * @throws
@@ -247,9 +247,11 @@ class Filesystem {
 
 		} else {
 
-			//remove the file
-			if (!unlink($path)) {
-				throw new \Exception(sprintf('Unable to delete file "%s".', $path));
+			//remove the file if it exists
+			if (is_file($path)) {
+				if (!unlink($path)) {
+					throw new \Exception(sprintf('Unable to delete file "%s".', $path));
+				}
 			}
 
 		}

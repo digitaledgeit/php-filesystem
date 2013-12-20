@@ -5,6 +5,11 @@ use Traversable;
 
 /**
  * Finder
+ * Note this issue with PHP when searching thousands of directories
+ *  @see https://bugs.php.net/bug.php?id=47396
+ *  @see http://gnuvince.wordpress.com/2008/10/28/php-wrong-for-long-running-processes-wrong-for-america/
+ *  @see http://stackoverflow.com/questions/18744991/symfony2-process-component-unable-to-create-pipe-and-launch-a-new-process
+ *  @see https://github.com/composer/composer/pull/1981
  * @author James Newell <james@digitaledgeit.com.au>
  */
 class Finder implements \IteratorAggregate, \Countable {

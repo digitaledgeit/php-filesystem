@@ -10,6 +10,7 @@ use Traversable;
  *  @see http://gnuvince.wordpress.com/2008/10/28/php-wrong-for-long-running-processes-wrong-for-america/
  *  @see http://stackoverflow.com/questions/18744991/symfony2-process-component-unable-to-create-pipe-and-launch-a-new-process
  *  @see https://github.com/composer/composer/pull/1981
+ *  @see https://github.com/composer/satis/issues/64
  * @author James Newell <james@digitaledgeit.com.au>
  */
 class Finder implements \IteratorAggregate, \Countable {

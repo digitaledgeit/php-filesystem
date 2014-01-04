@@ -259,5 +259,36 @@ class Filesystem {
 		return $this;
 	}
 
+	/**
+	 * Gets the file content
+	 * @param   string $file
+	 * @return  string
+	 * @throws
+	 */
+	public function getContent($file) {
+
+		if (($content = file_get_contents($file)) === false) {
+			throw new \Exception('Unable to get file content.');
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Sets the file content
+	 * @param   string $file
+	 * @param   string $content
+	 * @return  $this
+	 * @throws
+	 */
+	public function setContent($file, $content) {
+
+		if (($content = file_put_contents($file, $content)) === false) {
+			throw new \Exception('Unable to set file content.');
+		}
+
+		return $this;
+	}
+
 }
  

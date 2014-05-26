@@ -19,6 +19,16 @@ class Finder implements \IteratorAggregate, \Countable {
 	const TYPE_FOLDER   = 'folders';
 
 	/**
+	 * Creates a new finder
+	 * @param   string      $path   The path to search
+	 * @return  Finder
+	 * @throws
+	 */
+	public static function create($path) {
+		return new self($path);
+	}
+
+	/**
 	 * The path to search in
 	 * @var     string
 	 */

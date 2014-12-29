@@ -2,6 +2,8 @@
 
 Filesystem functions (similar to Symfony... but simplifies copying/moving/deleting search results).
 
+**Note:** Symfony's `Filesystem.remove()` now takes a `Traversable` and can be used with Symfony's `Finder` results. If this is your use case, then please use Symfony instead.
+
 ## Installation
 
     composer require digitaledgeit/filesystem

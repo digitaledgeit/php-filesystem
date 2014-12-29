@@ -104,6 +104,50 @@ class Finder implements \IteratorAggregate, \Countable {
 	}
 
 	/**
+	 * Restricts file results to only those that were modified within the given period
+	 * @param   string  $op
+	 * @param   int     $time
+	 * @return  $this
+	 * @throws
+	 */
+	public function modified($op, $time) {
+		$this->filter(function($path /** @var \SplFileInfo $path */) use($op, $time) {
+			$mtime = $path->getMTime();
+
+			if ($path->isFile()) {
+
+				switch ($op) {
+
+					case '=':
+						return $mtime === $time;
+
+					case '!=':
+						return $mtime !== $time;
+
+					case '>':
+						return $mtime > $time;
+
+					case '>=':
+						return $mtime >= $time;
+
+					case '<':
+						return $mtime < $time;
+
+					case '<=':
+						return $mtime <= $time;
+
+					default:
+						throw new \InvalidArgumentException('Invalid operator '.$op);
+
+				}
+
+			}
+
+		});
+		return $this;
+	}
+
+	/**
 	 * Adds a filter to restrict the resulting list of files or folders
 	 * @param   callable    $filter
 	 * @return  $this

@@ -200,7 +200,7 @@ class Finder implements \IteratorAggregate, \Countable {
 	public function remove() {
 		$fs = new Filesystem();
 
-		foreach ($this->getIterator() as $srcPath) {
+		foreach (iterator_to_array($this->getIterator()) as $srcPath) {
 			$fs->remove($srcPath);
 		}
 

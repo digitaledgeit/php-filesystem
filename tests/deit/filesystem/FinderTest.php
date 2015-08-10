@@ -29,7 +29,7 @@ class FinderTest extends \PHPUnit_Framework_TestCase {
 		global $total_files;
 
 		$finder = new Finder('tests/test-data/bigtree');
-		
+
 		$this->assertEquals($total_files, count($finder->files()));
 
 		foreach ($finder->files()->named('#\.json$#') as $path) {
@@ -58,10 +58,8 @@ class FinderTest extends \PHPUnit_Framework_TestCase {
 
 	public function test_copy() {
 
-		$fs = new Filesystem();
-
-		$f = new Finder('tests/test-data/bigtree');
-		$f
+		$finder = new Finder('tests/test-data/bigtree');
+		$finder
 			->files()
 			->named('#\.json#')
 			->copyTo('tests/test-data-copy')

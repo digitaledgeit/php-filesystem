@@ -248,7 +248,7 @@ class Filesystem {
 		} else {
 
 			//remove the file if it exists
-			if (is_file($path)) {
+			if (is_file($path) || is_link($path)) {
 				if (!unlink($path)) {
 					throw new \Exception(sprintf('Unable to delete file "%s".', $path));
 				}
